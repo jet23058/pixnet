@@ -15,6 +15,10 @@ class PixnetController extends Controller
     /** @var PixnetService */
     private $service;
 
+    /**
+     * PixnetController constructor.
+     * @param PixnetService $service
+     */
     public function __construct(PixnetService $service)
     {
         $this->service = $service;
@@ -67,10 +71,15 @@ class PixnetController extends Controller
 
     /**
      * Q3
-     * @param $map
+     * @param array $map
+     * @return string
      */
-    public function solution($map)
+    public function solution(array $map): string
     {
+        // 取得目前 C 位
+        // 取得目前老鼠數
+        //
 
+        return '';
     }
 }

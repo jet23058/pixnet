@@ -2,9 +2,7 @@
 
 namespace App\Services;
 
-use App\Services\Forwarders\Cat;
-use App\Services\Forwarders\Dog;
-use App\Services\Forwarders\Falcon;
+use App\Services\Forwarders\Forwarder;
 
 /**
  * Class PixnetService
@@ -12,33 +10,16 @@ use App\Services\Forwarders\Falcon;
  */
 class PixnetService
 {
-    /** @var string  */
-    const ADAPTER_DOG = 'Dog';
-
-    /** @var string  */
-    const ADAPTER_FALCON = 'Falcon';
-
-    /** @var string  */
-    const ADAPTER_CAT = 'Cat';
-
     /**
      * @param string $adapter
-     * @return Cat|Dog|Falcon
+     * @return Forwarder
      * @throws \Exception
      */
     public function adapter(string $adapter)
     {
-        switch ($adapter) {
-            case self::ADAPTER_DOG:
-                return new Dog();
-                break;
-            case self::ADAPTER_FALCON:
-                return new Falcon();
-                break;
-            case self::ADAPTER_CAT:
-                return new Cat();
-                break;
+        if (!class_exists("App\Services\Forwarders\\{$adapter}")) {
+            throw new \Exception('error adapter.');
         }
-        throw new \Exception('error adapter.');
+        return app("App\Services\Forwarders\\{$adapter}");
     }
 }

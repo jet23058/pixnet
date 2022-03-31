@@ -9,6 +9,7 @@ namespace App\Services\Forwarders;
 class Dog implements Forwarder
 {
     /**
+     * 不足的公斤數仍然進位
      * @param string $area
      * @param float $weight
      * @return int
