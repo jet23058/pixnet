@@ -73,13 +73,114 @@ class PixnetController extends Controller
      * Q3
      * @param array $map
      * @return string
+     * @throws \Throwable
      */
     public function solution(array $map): string
     {
-        // 取得目前 C 位
-        // 取得目前老鼠數
-        //
+        $catName = 'C';
 
-        return '';
+        // 取得貓位置
+        $cat = [];
+        foreach ($map as $index => $item) {
+            $column = array_search($catName, $item, true);
+            if ($column === false) {
+                continue;
+            }
+            $cat['row'] = $index;
+            $cat['column'] = $column;
+        }
+        throw_if(empty($cat), new Exception('至少一隻貓'));
+
+        $permutations = [];
+        $mouseNames = ['X', 'Y', 'Z'];
+        $this->getCombinationToString($mouseNames, $permutations);
+        $final = [];
+        foreach ($permutations as $permutation) {
+            $result = $this->mappings($permutation, $map, $cat);
+            $key = in_array($this->service::NO_RESULT, $result, true) ? $this->service::NO_RESULT : $this->service->getSolutionFormat($result);
+            $final[$key] = $key === $this->service::NO_RESULT ? 'error' : array_sum($result);
+        }
+
+        return array_search(min($final), $final, true);
+    }
+
+    /**
+     * @param array $permutation
+     * @param array $map
+     * @param array $cat
+     * @return array
+     * @throws \Throwable
+     */
+    public function mappings(array $permutation, array $map, array $cat): array
+    {
+        // 取得老鼠位置
+        $mouses = [];
+        foreach ($permutation as $mouseName) {
+            foreach ($map as $index => $item) {
+                $column = array_search($mouseName, $item, true);
+                if ($column === false) {
+                    continue;
+                }
+                $mouses[$mouseName]['row'] = $index;
+                $mouses[$mouseName]['column'] = $column;
+            }
+        }
+        throw_if(empty($mouses), new Exception('至少一隻老鼠'));
+
+        $countRow = count($map);
+        $countColumn = count($map[0]);
+
+        $map[$cat['row']][$cat['column']] = 0;
+        $this->service->setMap($map);
+        $this->service->setMapX($countRow);
+        $this->service->setMapY($countColumn);
+
+        $row = $cat['row'];
+        $column = $cat['column'];
+
+        $index = 0;
+        $result = [];
+        foreach ($mouses as $name => $mouse) {
+            $this->service->bestStep = $countRow * $countColumn + 1;
+            $this->service->step = 0;
+            $this->service->bestMap = 0;
+            $this->service->solution($row, $column, $name);
+
+            $row = $mouse['row'];
+            $column = $mouse['column'];
+            $map[$row][$column] = 0;
+            $this->service->setMap($map);
+
+            $result[$name] = $this->service->getBestStep() === $countRow * $countColumn ? $this->service::NO_RESULT : $this->service->getBestStep();
+
+            $index++;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $arr
+     * @param array $result
+     * @param int $offset
+     */
+    public function getCombinationToString(array &$arr, array &$result, int $offset = 0): void
+    {
+        $m = count($arr);
+
+        if ($m === $offset) {
+            $result[] = $arr;
+            return;
+        }
+
+        for ($i = $offset; $i < $m; ++$i) {
+            $tmp = $arr[$i];
+            $arr[$i] = $arr[$offset];
+            $arr[$offset] = $tmp;
+            $this->getCombinationToString($arr, $result, $offset + 1);
+            $tmp = $arr[$i];
+            $arr[$i] = $arr[$offset];
+            $arr[$offset] = $tmp;
+        }
     }
 }

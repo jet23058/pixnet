@@ -117,9 +117,9 @@ class PixnetTest extends TestCase
      * @dataProvider getSolutionData
      * @param array $request
      * @param string $expected
-     * @throws \Exception
+     * @throws \Exception|\Throwable
      */
-    public function test_貓抓老鼠(array $request, string $expected): void
+    public function test_貓抓老鼠成功(array $request, string $expected): void
     {
         // arrange
 
@@ -128,5 +128,43 @@ class PixnetTest extends TestCase
 
         // assert
         $this->assertSame($result, $expected);
+    }
+
+    public function getSolutionFailedData(): array
+    {
+        return [
+            '未有任何一隻貓' => [
+                'request' => [
+                    [0, 0, 0, 0, 'Y', 1, 0, 0],
+                    [0, 0, 0, 1, 1, 1, 0, 0],
+                ],
+                'expected' => '至少一隻貓',
+            ],
+            '未有任何一隻老鼠' => [
+                'request' => [
+                    [0, 0, 0, 0, 0, 1, 0, 0],
+                    [0, 0, 'C', 1, 1, 1, 0, 0],
+                ],
+                'expected' => '至少一隻老鼠',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getSolutionFailedData
+     * @param array $request
+     * @param string $expected
+     * @throws \Throwable
+     */
+    public function test_貓抓老鼠失敗(array $request, string $expected): void
+    {
+        // arrange
+
+        // assert
+        $this->expectException(\Throwable::class);
+        $this->getExpectedExceptionMessage($expected);
+
+        // action
+        app(PixnetController::class)->solution($request);
     }
 }
