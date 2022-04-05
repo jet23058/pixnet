@@ -12,6 +12,10 @@
 
 ### Q3: 
     app/Http/Controllers/PixnetController.php->solution
+    
+    test: tests/Unit/PixnetTest.php->test_貓抓老鼠成功
+    test: tests/Unit/PixnetTest.php->test_貓抓老鼠失敗
+    test: tests/Unit/PixnetTest.php->test_取得老鼠排列組合
 
 ### Q4: 
     tests/Unit/PixnetTest.php

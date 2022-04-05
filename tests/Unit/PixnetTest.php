@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Http\Controllers\PixnetController;
+use App\Services\CheckerBoardService;
 use Tests\TestCase;
 
 /**
@@ -110,6 +111,18 @@ class PixnetTest extends TestCase
                 ],
                 'expected' => '3Y',
             ],
+            'case 4' => [
+                'request' => [
+                    [0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 'C', 0, 1, 1, 1, 0, 0],
+                    [1, 1, 1, 0, 'Z', 0, 0, 0],
+                    [0, 1, 1, 1, 0, 0, 0, 0],
+                    [0, 'X', 1, 0, 0, 0, 0, 0],
+                    [0, 0, 1, 'Y', 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                'expected' => '9Z3Y4X',
+            ],
         ];
     }
 
@@ -138,14 +151,12 @@ class PixnetTest extends TestCase
                     [0, 0, 0, 0, 'Y', 1, 0, 0],
                     [0, 0, 0, 1, 1, 1, 0, 0],
                 ],
-                'expected' => '至少一隻貓',
             ],
             '未有任何一隻老鼠' => [
                 'request' => [
                     [0, 0, 0, 0, 0, 1, 0, 0],
                     [0, 0, 'C', 1, 1, 1, 0, 0],
                 ],
-                'expected' => '至少一隻老鼠',
             ],
         ];
     }
@@ -153,18 +164,29 @@ class PixnetTest extends TestCase
     /**
      * @dataProvider getSolutionFailedData
      * @param array $request
-     * @param string $expected
      * @throws \Throwable
      */
-    public function test_貓抓老鼠失敗(array $request, string $expected): void
+    public function test_貓抓老鼠失敗(array $request): void
     {
         // arrange
 
         // assert
         $this->expectException(\Throwable::class);
-        $this->getExpectedExceptionMessage($expected);
+        $this->getExpectedExceptionMessage();
 
         // action
         app(PixnetController::class)->solution($request);
+    }
+
+    public function test_取得老鼠排列組合(): void
+    {
+        // arrange
+        $result = [];
+
+        // action
+        app(CheckerBoardService::class)->getPermutations(['X', 'Y', 'Z'], $result);
+
+        // assert
+        $this->assertCount(6, $result);
     }
 }
